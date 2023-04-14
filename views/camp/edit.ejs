@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Camp</title>
+  </head>
+  <body>
+    <h1>Edit Camp</h1>
+    <form action="/neercamp/<%=camp.id%>?_method=PUT" method="POST">
+      <div>
+        <label for="title"> Title</label>
+        <input
+          type="text"
+          id="title"
+          name="camp[title]"
+          value="<%=camp.title%>"
+        />
+      </div>
+      <div>
+        <label for="location"> Location</label>
+        <input
+          type="text"
+          id="location"
+          name="camp[location]"
+          value="<%=camp.location%>"
+        />
+      </div>
+      <button>update camp</button>
+    </form>
+    <a href="/neercamp">cancel</a>
+  </body>
+</html>
