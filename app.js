@@ -2,7 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const dotenv = require('dotenv');
+const ejsMate = require('ejs-mate');
+const catchAsync = require('./utils/catchAsync');
 const app = express();
+
 dotenv.config();
 const Camp = require('./models/camp');
 const methodOverride = require('method-override');
@@ -22,6 +25,7 @@ mongoose
   .then(() => console.log('mongoDB connected'))
   .catch((err) => console.log(err));
 
+app.engine('ejs', ejsMate);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -29,20 +33,26 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
-app.get('/neercamp', async (req, res) => {
-  const camps = await Camp.find({});
-  res.render('camp/index', { camps });
-});
+app.get(
+  '/neercamp',
+  catchAsync(async (req, res, next) => {
+    const camps = await Camp.find({});
+    res.render('camp/index', { camps });
+  })
+);
 
 app.get('/neercamp/new', async (req, res) => {
   res.render('camp/new');
 });
 
-app.post('/neercamp', async (req, res) => {
-  const camp = new Camp(req.body.camp);
-  await camp.save();
-  res.redirect(`/neercamp/${camp._id}`);
-});
+app.post(
+  '/neercamp',
+  catchAsync(async (req, res, next) => {
+    const camp = new Camp(req.body.camp);
+    await camp.save();
+    res.redirect(`/neercamp/${camp._id}`);
+  })
+);
 
 app.get('/neercamp/:id', async (req, res) => {
   const { id } = req.params;
@@ -71,6 +81,11 @@ app.delete('/neercamp/:id', async (req, res) => {
   const camp = await Camp.findByIdAndRemove(id);
   res.redirect('/neercamp');
 });
+
+app.use((err, req, res, next) => {
+  res.send('something went wrong');
+});
+
 app.listen(PORT, () => {
   console.log(`serving at http://localhost:${PORT}`);
 });
